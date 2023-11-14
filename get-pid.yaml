@@ -1,0 +1,16 @@
+---
+- name: Get PID of a specific port
+  hosts: node
+  become: yes
+
+  vars:
+    target_port: 3700
+  tasks:
+    - name: Get PID of the specific port
+      command: "lsof -t -i :{{ target_port }}"
+      register: pid_result
+
+    - name: Display PID result
+      debug:
+        var: pid_result.stdout_lines
+

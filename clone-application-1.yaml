@@ -1,0 +1,39 @@
+---
+- name: Clone Git Repository
+  hosts: node
+  become: yes  # Run tasks with sudo
+
+  vars:
+    repo_url: "https://github.com/extwiii/Nodejs-Real-time-Chat-App.git"
+    dest_directory: "/home/ansiblenode/node-application"
+    command_to_run: "index.js"
+
+  tasks:
+    - name: Ensure destination directory exists
+      file:
+        path: "{{ dest_directory }}"
+        state: directory
+
+    - name: Clone Git repository
+      git:
+        repo: "{{ repo_url }}"
+        dest: "{{ dest_directory }}"
+    - name: Change to the application directory
+      command: "cd {{ dest_directory }}"
+      command: "ls"
+      register: output
+    - name: Display output
+      debug:
+        var: output
+      #args:
+      #  chdir: "{{ dest_directory }}"
+      #become_user: ansiblenode
+
+    - name: Run Node.js application
+      shell: "echo 'nohup node {{ dest_directory }}/{{ command_to_run }} > /dev/null 2>&1 &' | at now"
+      async: 0
+      poll: 0
+      ignore_errors: yes
+      #args:
+      #  chdir: "{{ dest_directory }}"
+      become_user: ansiblenode

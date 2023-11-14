@@ -1,0 +1,14 @@
+---
+- name: Kill process based on port number
+  hosts: node
+  become: yes  
+
+  tasks:
+    - name: Find process ID based on port 3700
+      shell: "lsof -t -i:3700"
+      register: process_id
+      ignore_errors: true
+
+    - name: Kill the process if found
+      command: "kill -9 {{ process_id.stdout }}"
+      when: process_id.stdout is defined
